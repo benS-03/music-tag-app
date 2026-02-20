@@ -1,6 +1,6 @@
 const express = require('express');
-const pool = require('./src/db/db.js')
-require('dotenv').config()
+const pool = require('./src/db/db.js');
+require('dotenv').config();
 
 const {auth} = require('express-openid-connect');
 const auth_config = {
@@ -14,13 +14,14 @@ const auth_config = {
 
 
 const spotifyRoutes = require('./src/routes/spotify.js');
+const songRoutes = require('./src/routes/song.js');
 
 
 
 const app = express();
-app.use('/spotify', spotifyRoutes);
 app.use(express.json());
-;
+app.use('/spotify', spotifyRoutes);
+app.use('/song', songRoutes);
 
 
 // Testing Endpoints

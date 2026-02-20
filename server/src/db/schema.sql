@@ -6,9 +6,11 @@ CREATE TABLE users (
 
 CREATE TABLE songs (
     id SERIAL PRIMARY KEY,
+    spotify_id VARCHAR(50) UNIQUE,
     title VARCHAR(50) NOT NULL,
     artist VARCHAR(50),
     album VARCHAR(50),
+    spotify_image VARCHAR(500),
     duration INT,
     first_user INT REFERENCES users(id),
     created_at TIMESTAMP DEFAULT NOW()
