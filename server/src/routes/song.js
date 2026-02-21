@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {createSong, getSongs} = require('../services/songService')
-
+const {getSongDataById} = require('../services/spotifyService');
 
 /*
 EXPECTED PAYLOAD
@@ -16,12 +16,15 @@ EXPECTED PAYLOAD
 */
 router.post('/save_song', async (req, res) => {
 
-    const {spotifyId, name, artist, album, image, duration} = req.body;
+    console.log('Body Received: ', req.body);
+    const id = req.body.spotifyId;
 
-    console.log(`{$name} being saved to db`);
+    console.log(`${id} being saved to db`);
 
     try {
-        const song = await createSong({spotifyId, name, artist, album, image, duration});
+        const data = await getSongDataById(id);
+        const {spotifyId, name, artist, album, image, duration} = data;
+        const song = await createSong(data);
         res.status(201).json(song);
     } catch (err) {
         console.error(err);

@@ -30,4 +30,34 @@ async function getAccessToken() {
 }
 
 
-module.exports = { getAccessToken };
+async function getSongDataById(spotifyId){
+
+    const accessToken = await getAccessToken();
+
+    const response = await fetch(`https://api.spotify.com/v1/tracks/${spotifyId}`, 
+        {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        }
+    );
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Spotify API error: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+    const data = await response.json();
+
+    return {
+        spotifyId: data.id,
+        name: data.name,
+        artist: data.artists.map(a => a.name).join(', '),
+        album: data.album.name,
+        image: data.album.images[0],
+        duration: data.duration_ms
+    }
+}
+
+
+module.exports = { getAccessToken, getSongDataById };

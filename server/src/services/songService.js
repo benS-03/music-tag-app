@@ -55,5 +55,22 @@ async function getSongs({limit = 10, offset = 0, orderBy = 'title'} = {}) {
     }
 }
 
+async function getSongIdFromSpotfyId(spotifyId){
 
-module.exports = {createSong, getSongs};
+    const query = `
+    SELECT id 
+    FROM songs
+    WHERE spotify_id = $1`;
+
+    try {
+        const result = await pool.query(query, [spotifyId]);
+        if (result.rows.length === 0)
+            return -1;
+        return result.rows[0].id;
+    } catch (err) {
+        throw(err);
+    }
+}
+
+
+module.exports = {createSong, getSongs, getSongIdFromSpotfyId};
