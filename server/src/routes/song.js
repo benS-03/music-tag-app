@@ -3,20 +3,9 @@ const router = express.Router();
 const {createSong, getSongs} = require('../services/songService')
 const {getSongDataById} = require('../services/spotifyService');
 
-/*
-EXPECTED PAYLOAD
-{
-    spotifyID:
-    name:
-    artist:
-    album:
-    image:
-    duration:
-}
-*/
+
 router.post('/save_song', async (req, res) => {
 
-    console.log('Body Received: ', req.body);
     const id = req.body.spotifyId;
 
     console.log(`${id} being saved to db`);

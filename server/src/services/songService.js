@@ -9,6 +9,8 @@ async function createSong(data){
     const query = `
     INSERT INTO songs (spotify_id, title, artist, album, spotify_image, duration)
     VALUES ($1, $2, $3, $4, $5, $6)
+    ON CONFLICT (spotify_id)
+    DO NOTHING
     RETURNING *`;
 
     try{
@@ -24,6 +26,7 @@ async function createSong(data){
 
         return result.rows[0];
     } catch (err) {
+        
         throw err;
     }
 

@@ -18,7 +18,7 @@ async function createTag(title) {
 }
 
 async function createSongTag(data) {
-    {tagId, songId, userId}
+    const {tagId, songId, userId} = data;
     
     const query = `
     INSERT INTO song_tags (song_id, tag_id, created_by)
