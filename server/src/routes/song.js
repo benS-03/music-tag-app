@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {createSong, getSongs} = require('../services/songService')
+const {createSong, getSongs, getFilteredSongs} = require('../services/songService')
 const {getSongDataById} = require('../services/spotifyService');
 
 
@@ -23,12 +23,24 @@ router.post('/save_song', async (req, res) => {
 
 router.get('/get_songs', async (req, res) => {
 
-    const {limit, offset, orderBy} = req.query;
-    const parsedLimit = limit? parseInt(limit, 10) : undefined;
-    const parsedOffset = offset ? parseInt(offset, 10) : undefined;
-
+    const {tags, match, limit, offset, orderBy} = req.query;
+    const parsedLimit = Number(limit) || 10;
+    const parsedOffset = Number(offset) || 0;
+    let songs
     try {
-        const songs = await getSongs({parsedLimit, parsedOffset, orderBy});
+
+        if (!tags) {
+            songs = await getSongs({limit: parsedLimit, offset: parsedOffset, orderBy});
+        } else {
+            const tagArray = tags? tags.split(','): [];
+            songs = await getFilteredSongs({
+                tags: tagArray, 
+                match, 
+                limit: parsedLimit, 
+                offset: parsedOffset, 
+                orderBy});
+        }
+
         res.status(200).json(songs);
     } catch (err) {
         console.error(err);

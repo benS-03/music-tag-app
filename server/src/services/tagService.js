@@ -22,7 +22,7 @@ async function createSongTag(data) {
     
     const query = `
     INSERT INTO song_tags (song_id, tag_id, created_by)
-    VALUES $1, $2, $3
+    VALUES ($1, $2, $3)
     RETURNING *`
 
     try {
@@ -31,6 +31,8 @@ async function createSongTag(data) {
             songId,
             userId
         ]);
+
+        return result.rows[0];
     } catch (err) {
         throw(err);
     }

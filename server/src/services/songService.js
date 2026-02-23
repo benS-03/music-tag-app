@@ -10,7 +10,7 @@ async function createSong(data){
     INSERT INTO songs (spotify_id, title, artist, album, spotify_image, duration)
     VALUES ($1, $2, $3, $4, $5, $6)
     ON CONFLICT (spotify_id)
-    DO NOTHING
+    DO UPDATE SET spotify_id = EXCLUDED.spotify_id
     RETURNING *`;
 
     try{
@@ -76,4 +76,51 @@ async function getSongIdFromSpotfyId(spotifyId){
 }
 
 
-module.exports = {createSong, getSongs, getSongIdFromSpotfyId};
+async function getFilteredSongs({tags, match = 'any', limit = 10, offset = 0, orderBy = 'title'} = {})
+{
+    const allowedColumns = ['title', 'artist', 'album', 'created_at']
+
+    if(!allowedColumns.includes(orderBy))
+        orderBy = 'title';
+
+    try {
+        if (match === 'all'){
+            const query = `
+            SELECT * 
+            FROM songs s
+            JOIN song_tags st ON s.id = st.song_id
+            JOIN tags t ON t.id = st.tag_id
+            WHERE t.title = ANY($1)
+            GROUP BY s.id
+            HAVING COUNT(DISTINCT t.title) = $2
+            ORDER BY ${orderBy}
+            LIMIT $3 OFFSET $4
+            `;
+
+            const result = await pool.query(query, [tags, tags.length, limit, offset]);
+
+            return result.rows;
+
+
+        } else {
+            const query = `
+            SELECT * 
+            FROM songs s
+            JOIN song_tags st ON s.id = st.song_id
+            JOIN tags t ON t.id = st.tag_id
+            WHERE t.title = ANY($1)
+            ORDER BY ${orderBy}
+            LIMIT $2 OFFSET $3
+            `;
+
+        const result = await pool.query(query, [tags, limit, offset]);
+
+        return result.rows;
+        }
+    } catch (err) {
+        throw(err);
+    }
+}
+
+
+module.exports = {createSong, getSongs, getFilteredSongs,getSongIdFromSpotfyId};
