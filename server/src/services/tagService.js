@@ -6,7 +6,8 @@ async function createTag(title) {
     const query = `
     INSERT INTO tags (title)
     VALUES ($1)
-    RETURNING title`;
+    ON CONFLICT (title) DO UPDATE SET title = EXCLUDED.title
+    RETURNING *`;
 
     try {
         const result = await pool.query(query, [title]);
@@ -27,8 +28,8 @@ async function createSongTag(data) {
 
     try {
         const result = await pool.query(query, [
-            tagId,
             songId,
+            tagId,
             userId
         ]);
 
